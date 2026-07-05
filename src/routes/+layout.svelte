@@ -1,5 +1,6 @@
 <script lang="ts">
 	import '../app.css';
+	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 
 	let { children } = $props();
 </script>
@@ -12,6 +13,10 @@
 		rel="stylesheet"
 	/>
 </svelte:head>
+
+<div class="theme-toggle">
+	<ThemeToggle />
+</div>
 
 <main>
 	{@render children()}
