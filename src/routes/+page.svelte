@@ -1,50 +1,12 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import Clapperboard from '@lucide/svelte/icons/clapperboard';
 	import Film from '@lucide/svelte/icons/film';
-	import LogOut from '@lucide/svelte/icons/log-out';
 	import Plus from '@lucide/svelte/icons/plus';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
-
-	function getInitials(user: PageData['user']) {
-		const source = user.name?.trim() || user.email;
-		const parts = source.split(/\s+/).filter(Boolean);
-		if (parts.length >= 2) {
-			return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-		}
-		return source.slice(0, 2).toUpperCase();
-	}
 </script>
-
-<header>
-	<div class="brand">
-		<div class="brand-mark">
-			<Clapperboard size={24} strokeWidth={1.75} />
-		</div>
-		<div class="brand-copy">
-			<h1>Watchlist</h1>
-			<p class="subtitle">Movies you want to see</p>
-		</div>
-	</div>
-	<div class="user-bar">
-		<span class="user-avatar" title={data.user.name || data.user.email}>
-			{#if data.user.image}
-				<img src={data.user.image} alt="" />
-			{:else}
-				{getInitials(data.user)}
-			{/if}
-		</span>
-		<span class="user-bar-divider" aria-hidden="true"></span>
-		<form method="post" action="?/signOut" use:enhance>
-			<button type="submit" class="btn-icon-only" aria-label="Sign out">
-				<LogOut size={16} />
-			</button>
-		</form>
-	</div>
-</header>
 
 <section>
 	<h2>Add a movie</h2>

@@ -17,7 +17,7 @@ export const load: PageServerLoad = async (event) => {
 		.where(eq(movie.userId, user.id))
 		.orderBy(desc(movie.createdAt));
 
-	return { user, movies };
+	return { movies };
 };
 
 export const actions: Actions = {

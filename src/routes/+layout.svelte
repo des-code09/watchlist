@@ -1,8 +1,9 @@
 <script lang="ts">
 	import '../app.css';
-	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
+	import TopNav from '$lib/components/TopNav.svelte';
+	import type { LayoutData } from './$types';
 
-	let { children } = $props();
+	let { data, children }: { data: LayoutData; children: import('svelte').Snippet } = $props();
 </script>
 
 <svelte:head>
@@ -14,9 +15,7 @@
 	/>
 </svelte:head>
 
-<div class="theme-toggle">
-	<ThemeToggle />
-</div>
+<TopNav user={data.user} />
 
 <main>
 	{@render children()}

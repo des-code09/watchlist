@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import Clapperboard from '@lucide/svelte/icons/clapperboard';
 	import Lock from '@lucide/svelte/icons/lock';
 	import LogIn from '@lucide/svelte/icons/log-in';
 	import Mail from '@lucide/svelte/icons/mail';
@@ -12,13 +11,8 @@
 </script>
 
 <div class="card">
-	<div class="brand">
-		<Clapperboard size={28} />
-		<div>
-			<h1>Watchlist</h1>
-			<p class="subtitle">Sign in or create an account to get started.</p>
-		</div>
-	</div>
+	<h1>Sign in</h1>
+	<p class="subtitle card-intro">Create an account or log in to manage your watchlist.</p>
 
 	<form method="post" action="?/signInEmail" use:enhance>
 		<label>
