@@ -188,9 +188,18 @@ ul {
 }
 
 li {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem;
 	padding: 0.875rem 1.125rem;
 	font-size: 1rem;
 	border-bottom: 1px solid var(--color-border);
+}
+
+li form {
+	margin: 0;
+	flex-direction: row;
 }
 
 li:last-child {

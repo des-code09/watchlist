@@ -36,7 +36,13 @@
 	{:else}
 		<ul>
 			{#each data.movies as movie (movie.id)}
-				<li>{movie.title}</li>
+				<li>
+					<span>{movie.title}</span>
+					<form method="post" action="?/removeMovie" use:enhance>
+						<input type="hidden" name="id" value={movie.id} />
+						<button type="submit" class="secondary">Remove</button>
+					</form>
+				</li>
 			{/each}
 		</ul>
 	{/if}
