@@ -3,6 +3,7 @@
 	import Film from '@lucide/svelte/icons/film';
 	import Plus from '@lucide/svelte/icons/plus';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
+	import { fade } from 'svelte/transition';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -35,7 +36,7 @@
 	{:else}
 		<ul>
 			{#each data.movies as movie (movie.id)}
-				<li>
+				<li out:fade={{ duration: 200 }}>
 					<div class="movie-title">
 						<Film size={18} />
 						<span>{movie.title}</span>
@@ -44,7 +45,7 @@
 						<input type="hidden" name="id" value={movie.id} />
 						<button
 							type="submit"
-							class="secondary btn-icon-only"
+							class="btn-icon-only"
 							aria-label="Remove movie"
 						>
 							<Trash2 size={16} />
