@@ -1,29 +1,21 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import Film from '@lucide/svelte/icons/film';
-	import Plus from '@lucide/svelte/icons/plus';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import { fade } from 'svelte/transition';
-	import type { ActionData, PageData } from './$types';
+	import MovieSearch from '$lib/components/MovieSearch.svelte';
+	import type { PageData } from './$types';
 
-	let { data, form }: { data: PageData; form: ActionData } = $props();
+	let { data }: { data: PageData } = $props();
+
+	const existingTmdbIds = $derived(
+		data.movies.flatMap((movie) => (movie.tmdbId != null ? [movie.tmdbId] : []))
+	);
 </script>
 
 <section>
 	<h2>Add a movie</h2>
-	<form method="post" action="?/addMovie" use:enhance class="inline">
-		<label>
-			Title
-			<input type="text" name="title" placeholder="e.g. The Godfather" required />
-		</label>
-		<button type="submit" class="btn-with-icon">
-			<Plus size={16} />
-			Add
-		</button>
-	</form>
-	{#if form?.message}
-		<p class="error">{form.message}</p>
-	{/if}
+	<MovieSearch {existingTmdbIds} />
 </section>
 
 <section>
@@ -38,16 +30,16 @@
 			{#each data.movies as movie (movie.id)}
 				<li out:fade={{ duration: 200 }}>
 					<div class="movie-title">
-						<Film size={18} />
+						{#if movie.posterUrl}
+							<img src={movie.posterUrl} alt="" class="movie-poster" loading="lazy" />
+						{:else}
+							<Film size={18} />
+						{/if}
 						<span>{movie.title}</span>
 					</div>
 					<form method="post" action="?/removeMovie" use:enhance>
 						<input type="hidden" name="id" value={movie.id} />
-						<button
-							type="submit"
-							class="btn-icon-only"
-							aria-label="Remove movie"
-						>
+						<button type="submit" class="btn-icon-only" aria-label="Remove movie">
 							<Trash2 size={16} />
 						</button>
 					</form>

@@ -95,6 +95,7 @@
 	/* Accent & semantic colors — dark mode */
 	--color-bg: #1c1917;
 	--color-surface: #292524;
+	--color-row-hover: #35302d;
 	--color-text: #fafaf9;
 	--color-text-muted: #a8a29e;
 	--color-border: #44403c;
@@ -113,6 +114,7 @@
 		/* Accent & semantic colors — dark mode */
 		--color-bg: #1c1917;
 		--color-surface: #292524;
+		--color-row-hover: #35302d;
 		--color-text: #fafaf9;
 		--color-text-muted: #a8a29e;
 		--color-border: #44403c;

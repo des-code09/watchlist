@@ -4,6 +4,7 @@ import type { Actions, PageServerLoad } from './$types';
 import { auth } from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import { movie } from '$lib/server/db/schema';
+import { isValidPosterUrl } from '$lib/server/tmdb';
 
 export const load: PageServerLoad = async (event) => {
 	const user = event.locals.user;
@@ -29,12 +30,38 @@ export const actions: Actions = {
 
 		const formData = await event.request.formData();
 		const title = formData.get('title')?.toString().trim() ?? '';
+		const tmdbIdRaw = formData.get('tmdbId')?.toString();
+		const posterUrl = formData.get('posterUrl')?.toString().trim() ?? '';
+		const tmdbId = tmdbIdRaw ? Number.parseInt(tmdbIdRaw, 10) : NaN;
 
 		if (!title) {
 			return fail(400, { message: 'Title is required' });
 		}
 
-		await db.insert(movie).values({ title, userId: user.id });
+		if (!tmdbIdRaw || Number.isNaN(tmdbId) || tmdbId <= 0) {
+			return fail(400, { message: 'Select a movie from search results' });
+		}
+
+		if (!isValidPosterUrl(posterUrl || null)) {
+			return fail(400, { message: 'Invalid poster URL' });
+		}
+
+		const [existing] = await db
+			.select({ id: movie.id })
+			.from(movie)
+			.where(and(eq(movie.userId, user.id), eq(movie.tmdbId, tmdbId)))
+			.limit(1);
+
+		if (existing) {
+			return fail(409, { message: 'Already on your list' });
+		}
+
+		await db.insert(movie).values({
+			title,
+			tmdbId,
+			posterUrl: posterUrl || null,
+			userId: user.id
+		});
 	},
 	removeMovie: async (event) => {
 		const user = event.locals.user;
