@@ -8,6 +8,13 @@
       "when": 1783191724662,
       "tag": "0000_lush_sentinel",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1783192000000,
+      "tag": "0001_add_movie_table",
+      "breakpoints": true
     }
   ]
 }
