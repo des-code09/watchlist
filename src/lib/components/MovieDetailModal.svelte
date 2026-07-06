@@ -5,17 +5,11 @@
 	import Play from '@lucide/svelte/icons/play';
 	import Star from '@lucide/svelte/icons/star';
 	import X from '@lucide/svelte/icons/x';
-
-	type MovieDetails = {
-		title: string;
-		overview: string | null;
-		releaseYear: string | null;
-		genres: string[];
-		voteAverage: number | null;
-		backdropUrl: string | null;
-		posterUrl: string | null;
-		trailer: { youtubeKey: string } | null;
-	};
+	import {
+		fetchMovieDetails,
+		getCachedMovieDetails,
+		type MovieDetails
+	} from '$lib/movie-details';
 
 	export type ListMovie = {
 		id: number;
@@ -36,7 +30,6 @@
 
 	let dialogEl = $state<HTMLDialogElement | null>(null);
 	let details = $state<MovieDetails | null>(null);
-	let loading = $state(false);
 	let loadError = $state<string | null>(null);
 	let playingTrailer = $state(false);
 	let userRating = $state<number | null>(null);
@@ -59,21 +52,24 @@
 		return `${score}/10`;
 	}
 
-	async function fetchDetails(tmdbId: number) {
-		loading = true;
+	async function loadMovie(currentMovie: ListMovie) {
 		loadError = null;
-		details = null;
 
 		try {
-			const response = await fetch(`/api/tmdb/movie/${tmdbId}`);
-			if (!response.ok) {
-				throw new Error('Failed to load details');
+			if (!currentMovie.tmdbId) {
+				loadError = 'Details unavailable for this movie.';
+				details = null;
+				return;
 			}
-			details = (await response.json()) as MovieDetails;
+
+			const data = await fetchMovieDetails(currentMovie.tmdbId);
+			if (loadedMovieId !== currentMovie.id) return;
+			details = data;
 		} catch {
-			loadError = 'Could not load movie details. Try again.';
-		} finally {
-			loading = false;
+			if (loadedMovieId === currentMovie.id) {
+				loadError = 'Could not load movie details. Try again.';
+				details = null;
+			}
 		}
 	}
 
@@ -141,6 +137,28 @@
 	});
 
 	$effect(() => {
+		if (!browser) return;
+
+		if (!movie) return;
+
+		const scrollY = window.scrollY;
+		const { documentElement: html, body } = document;
+
+		html.classList.add('scroll-locked');
+		body.style.position = 'fixed';
+		body.style.top = `-${scrollY}px`;
+		body.style.width = '100%';
+
+		return () => {
+			html.classList.remove('scroll-locked');
+			body.style.position = '';
+			body.style.top = '';
+			body.style.width = '';
+			window.scrollTo(0, scrollY);
+		};
+	});
+
+	$effect(() => {
 		if (!browser || !dialogEl) return;
 
 		if (!movie) {
@@ -155,21 +173,22 @@
 			return;
 		}
 
-		loadedMovieId = movie.id;
+		const currentMovie = movie;
+
+		loadedMovieId = currentMovie.id;
 		returnFocusEl = document.activeElement instanceof HTMLElement ? document.activeElement : null;
 		playingTrailer = false;
 		ratingError = null;
 		loadError = null;
-		details = null;
+		details = currentMovie.tmdbId ? (getCachedMovieDetails(currentMovie.tmdbId) ?? null) : null;
 
 		if (!dialogEl.open) {
 			dialogEl.showModal();
 		}
 
-		if (movie.tmdbId) {
-			void fetchDetails(movie.tmdbId);
-		} else {
-			loading = false;
+		if (!details) {
+			void loadMovie(currentMovie);
+		} else if (!currentMovie.tmdbId) {
 			loadError = 'Details unavailable for this movie.';
 		}
 	});
@@ -189,9 +208,7 @@
 			</button>
 
 			<div class="movie-detail-hero">
-				{#if loading}
-					<div class="movie-detail-hero-skeleton" aria-hidden="true"></div>
-				{:else if playingTrailer && details?.trailer}
+				{#if playingTrailer && details?.trailer}
 					<iframe
 						class="movie-detail-trailer"
 						src="https://www.youtube-nocookie.com/embed/{details.trailer.youtubeKey}?autoplay=1"
@@ -219,59 +236,61 @@
 			<div class="movie-detail-body">
 				<h2 id="movie-detail-title" class="movie-detail-title">{displayTitle}</h2>
 
-				{#if loadError}
-					<p class="error movie-detail-status">{loadError}</p>
-				{:else if !loading}
-					{#if details?.releaseYear || details?.voteAverage != null}
-						<p class="movie-detail-meta">
-							{#if details?.releaseYear}
-								<span>{details.releaseYear}</span>
-							{/if}
-							{#if details?.releaseYear && details?.voteAverage != null}
-								<span class="movie-detail-meta-sep" aria-hidden="true">·</span>
-							{/if}
-							{#if details?.voteAverage != null}
-								<span>TMDB {formatTmdbScore(details.voteAverage)}</span>
-							{/if}
-						</p>
-					{/if}
+				<div class="movie-detail-details">
+					{#if loadError}
+						<p class="error movie-detail-status">{loadError}</p>
+					{:else}
+						{#if details?.releaseYear || details?.voteAverage != null}
+							<p class="movie-detail-meta">
+								{#if details?.releaseYear}
+									<span>{details.releaseYear}</span>
+								{/if}
+								{#if details?.releaseYear && details?.voteAverage != null}
+									<span class="movie-detail-meta-sep" aria-hidden="true">·</span>
+								{/if}
+								{#if details?.voteAverage != null}
+									<span>TMDB {formatTmdbScore(details.voteAverage)}</span>
+								{/if}
+							</p>
+						{/if}
 
-					{#if (details?.genres ?? []).length > 0}
-						<div class="movie-detail-pills">
-							{#each details?.genres ?? [] as genre (genre)}
-								<span class="movie-detail-pill">{genre}</span>
-							{/each}
-						</div>
-					{/if}
+						{#if (details?.genres ?? []).length > 0}
+							<div class="movie-detail-pills">
+								{#each details?.genres ?? [] as genre (genre)}
+									<span class="movie-detail-pill">{genre}</span>
+								{/each}
+							</div>
+						{/if}
 
-					{#if details?.overview}
-						<p class="movie-detail-overview">{details.overview}</p>
-					{:else if !loadError}
-						<p class="movie-detail-overview movie-detail-overview-empty">No description available.</p>
+						{#if details?.overview}
+							<p class="movie-detail-overview">{details.overview}</p>
+						{:else if details}
+							<p class="movie-detail-overview movie-detail-overview-empty">No description available.</p>
+						{/if}
 					{/if}
+				</div>
 
-					<div class="movie-detail-rating">
-						<span class="movie-detail-rating-label">Add rating</span>
-						<div class="star-rating" role="group" aria-label="Add rating">
-							{#each [1, 2, 3, 4, 5] as star (star)}
-								<button
-									type="button"
-									class="star-rating-star"
-									class:star-rating-star-filled={userRating != null && star <= userRating}
-									aria-label="{star} star{star === 1 ? '' : 's'}"
-									aria-pressed={userRating != null && star <= userRating}
-									disabled={savingRating}
-									onclick={() => setRating(star)}
-								>
-									<Star size={16} fill={userRating != null && star <= userRating ? 'currentColor' : 'none'} />
-								</button>
-							{/each}
-						</div>
+				<div class="movie-detail-rating">
+					<span class="movie-detail-rating-label">Add rating</span>
+					<div class="star-rating" role="group" aria-label="Add rating">
+						{#each [1, 2, 3, 4, 5] as star (star)}
+							<button
+								type="button"
+								class="star-rating-star"
+								class:star-rating-star-filled={userRating != null && star <= userRating}
+								aria-label="{star} star{star === 1 ? '' : 's'}"
+								aria-pressed={userRating != null && star <= userRating}
+								disabled={savingRating}
+								onclick={() => setRating(star)}
+							>
+								<Star size={16} fill={userRating != null && star <= userRating ? 'currentColor' : 'none'} />
+							</button>
+						{/each}
 					</div>
+				</div>
 
-					{#if ratingError}
-						<p class="error movie-detail-status">{ratingError}</p>
-					{/if}
+				{#if ratingError}
+					<p class="error movie-detail-status">{ratingError}</p>
 				{/if}
 			</div>
 		</div>

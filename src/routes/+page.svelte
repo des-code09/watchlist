@@ -5,6 +5,7 @@
 	import { fade } from 'svelte/transition';
 	import MovieDetailModal, { type ListMovie } from '$lib/components/MovieDetailModal.svelte';
 	import MovieSearch from '$lib/components/MovieSearch.svelte';
+	import { prefetchMovieDetails } from '$lib/movie-details';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -40,7 +41,13 @@
 		<ul>
 			{#each data.movies as movie (movie.id)}
 				<li out:fade={{ duration: 200 }}>
-					<button type="button" class="movie-row-button" onclick={() => openDetail(movie)}>
+					<button
+						type="button"
+						class="movie-row-button"
+						onmouseenter={() => movie.tmdbId != null && prefetchMovieDetails(movie.tmdbId)}
+						onfocus={() => movie.tmdbId != null && prefetchMovieDetails(movie.tmdbId)}
+						onclick={() => openDetail(movie)}
+					>
 						<div class="movie-title">
 							{#if movie.posterUrl}
 								<img src={movie.posterUrl} alt="" class="movie-poster" loading="lazy" />

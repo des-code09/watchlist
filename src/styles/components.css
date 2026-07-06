@@ -724,8 +724,9 @@ li:last-child {
 	overflow: hidden;
 }
 
-.movie-detail-dialog::backdrop {
+.movie-detail-dialog[open]::backdrop {
 	background: rgb(0 0 0 / 0.55);
+	animation: movie-detail-backdrop-enter 0.2s ease-out;
 }
 
 .movie-detail-panel {
@@ -734,6 +735,7 @@ li:last-child {
 	flex-direction: column;
 	max-height: calc(100vh - var(--space-8));
 	overflow-y: auto;
+	overscroll-behavior: contain;
 }
 
 .movie-detail-close {
@@ -841,6 +843,10 @@ li:last-child {
 	letter-spacing: var(--letter-spacing-tight);
 }
 
+.movie-detail-details {
+	min-height: 0;
+}
+
 .movie-detail-meta {
 	display: flex;
 	flex-wrap: wrap;
@@ -935,4 +941,14 @@ li:last-child {
 
 .movie-detail-overview-empty {
 	color: var(--color-text-muted);
+}
+
+@keyframes movie-detail-backdrop-enter {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
 }
