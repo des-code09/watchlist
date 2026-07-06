@@ -21,16 +21,40 @@ export const load: PageServerLoad = async (event) => {
 
 	await Promise.all(
 		rows
-			.filter((row) => row.tmdbId != null && row.tmdbRating == null)
+			.filter(
+				(row) =>
+					row.tmdbId != null &&
+					(row.tmdbRating == null || row.genres == null || row.releaseYear == null)
+			)
 			.map(async (row) => {
 				try {
 					const details = await getMovieDetails(row.tmdbId!);
-					if (details.voteAverage != null) {
-						await db
-							.update(movie)
-							.set({ tmdbRating: details.voteAverage })
-							.where(eq(movie.id, row.id));
+					const updates: {
+						tmdbRating?: number;
+						genres?: string;
+						releaseYear?: number;
+					} = {};
+
+					if (row.tmdbRating == null && details.voteAverage != null) {
+						updates.tmdbRating = details.voteAverage;
 						row.tmdbRating = details.voteAverage;
+					}
+
+					if (row.genres == null && details.genres.length > 0) {
+						updates.genres = formatGenres(details.genres);
+						row.genres = updates.genres;
+					}
+
+					if (row.releaseYear == null && details.releaseYear) {
+						const parsedYear = Number.parseInt(details.releaseYear, 10);
+						if (!Number.isNaN(parsedYear) && parsedYear > 0) {
+							updates.releaseYear = parsedYear;
+							row.releaseYear = parsedYear;
+						}
+					}
+
+					if (Object.keys(updates).length > 0) {
+						await db.update(movie).set(updates).where(eq(movie.id, row.id));
 					}
 				} catch {
 					// Skip if TMDB details fail
