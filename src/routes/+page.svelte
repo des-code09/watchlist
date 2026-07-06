@@ -3,14 +3,25 @@
 	import Film from '@lucide/svelte/icons/film';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import { fade } from 'svelte/transition';
+	import MovieDetailModal, { type ListMovie } from '$lib/components/MovieDetailModal.svelte';
 	import MovieSearch from '$lib/components/MovieSearch.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 
+	let selectedMovie = $state<ListMovie | null>(null);
+
 	const existingTmdbIds = $derived(
 		data.movies.flatMap((movie) => (movie.tmdbId != null ? [movie.tmdbId] : []))
 	);
+
+	function openDetail(movie: (typeof data.movies)[number]) {
+		selectedMovie = movie;
+	}
+
+	function closeDetail() {
+		selectedMovie = null;
+	}
 </script>
 
 <section>
@@ -29,14 +40,16 @@
 		<ul>
 			{#each data.movies as movie (movie.id)}
 				<li out:fade={{ duration: 200 }}>
-					<div class="movie-title">
-						{#if movie.posterUrl}
-							<img src={movie.posterUrl} alt="" class="movie-poster" loading="lazy" />
-						{:else}
-							<Film size={18} />
-						{/if}
-						<span>{movie.title}</span>
-					</div>
+					<button type="button" class="movie-row-button" onclick={() => openDetail(movie)}>
+						<div class="movie-title">
+							{#if movie.posterUrl}
+								<img src={movie.posterUrl} alt="" class="movie-poster" loading="lazy" />
+							{:else}
+								<Film size={18} />
+							{/if}
+							<span>{movie.title}</span>
+						</div>
+					</button>
 					<form method="post" action="?/removeMovie" use:enhance>
 						<input type="hidden" name="id" value={movie.id} />
 						<button type="submit" class="btn-icon-only" aria-label="Remove movie">
@@ -48,3 +61,5 @@
 		</ul>
 	{/if}
 </section>
+
+<MovieDetailModal movie={selectedMovie} onclose={closeDetail} />

@@ -79,6 +79,40 @@ export const actions: Actions = {
 
 		await db.delete(movie).where(and(eq(movie.id, id), eq(movie.userId, user.id)));
 	},
+	updateRating: async (event) => {
+		const user = event.locals.user;
+		if (!user) {
+			return redirect(302, '/login');
+		}
+
+		const formData = await event.request.formData();
+		const idRaw = formData.get('id')?.toString();
+		const ratingRaw = formData.get('rating')?.toString();
+		const id = idRaw ? Number.parseInt(idRaw, 10) : NaN;
+
+		if (!idRaw || Number.isNaN(id)) {
+			return fail(400, { message: 'Invalid movie' });
+		}
+
+		let userRating: number | null = null;
+		if (ratingRaw && ratingRaw.trim() !== '') {
+			const rating = Number.parseInt(ratingRaw, 10);
+			if (Number.isNaN(rating) || rating < 1 || rating > 5) {
+				return fail(400, { message: 'Rating must be between 1 and 5' });
+			}
+			userRating = rating;
+		}
+
+		const result = await db
+			.update(movie)
+			.set({ userRating })
+			.where(and(eq(movie.id, id), eq(movie.userId, user.id)))
+			.returning({ id: movie.id });
+
+		if (result.length === 0) {
+			return fail(404, { message: 'Movie not found' });
+		}
+	},
 	signOut: async (event) => {
 		await auth.api.signOut({
 			headers: event.request.headers

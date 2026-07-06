@@ -6,6 +6,7 @@ export const movie = pgTable('movie', {
 	title: text('title').notNull(),
 	tmdbId: integer('tmdb_id'),
 	posterUrl: text('poster_url'),
+	userRating: integer('user_rating'),
 	userId: text('user_id')
 		.notNull()
 		.references(() => user.id),
