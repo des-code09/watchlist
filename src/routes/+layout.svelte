@@ -1,5 +1,6 @@
 <script lang="ts">
 	import '../app.css';
+	import PopcornBurst from '$lib/components/PopcornBurst.svelte';
 	import TopNav from '$lib/components/TopNav.svelte';
 	import type { LayoutData } from './$types';
 
@@ -7,6 +8,7 @@
 </script>
 
 <TopNav user={data.user} />
+<PopcornBurst />
 
 <main>
 	{@render children()}

@@ -9,6 +9,7 @@
 		getStatusLabel,
 		type MovieStatus
 	} from '$lib/movie';
+	import { triggerPopcorn } from '$lib/popcorn';
 
 	let {
 		movieId,
@@ -61,6 +62,10 @@
 		error = null;
 		saving = true;
 		closeMenu();
+
+		if (nextStatus === 'watching' || nextStatus === 'watched') {
+			triggerPopcorn(nextStatus);
+		}
 
 		const formData = new FormData();
 		formData.set('id', String(movieId));

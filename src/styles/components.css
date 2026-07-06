@@ -1351,3 +1351,85 @@ li:last-child {
 		opacity: 1;
 	}
 }
+
+.popcorn-burst {
+	position: fixed;
+	inset: 0;
+	z-index: 1000;
+	pointer-events: none;
+	overflow: hidden;
+}
+
+.popcorn-kernel {
+	--kernel-size: calc(28px * var(--scale));
+	position: absolute;
+	bottom: 0;
+	left: var(--x);
+	width: calc(var(--kernel-size) * 0.32);
+	height: calc(var(--kernel-size) * 0.32);
+	border-radius: 50%;
+	background: #fde68a;
+	box-shadow:
+		calc(var(--kernel-size) * 0.28) calc(var(--kernel-size) * -0.16) 0 calc(var(--kernel-size) * 0.13)
+			#fef9c3,
+		calc(var(--kernel-size) * -0.26) calc(var(--kernel-size) * 0.1) 0 calc(var(--kernel-size) * 0.11)
+			#facc15,
+		calc(var(--kernel-size) * 0.1) calc(var(--kernel-size) * 0.24) 0 calc(var(--kernel-size) * 0.12)
+			#fde68a,
+		calc(var(--kernel-size) * -0.2) calc(var(--kernel-size) * -0.24) 0 calc(var(--kernel-size) * 0.1)
+			#fef3c7;
+	transform: translateX(-50%) scale(1);
+	opacity: 0;
+	animation: popcorn-rise var(--duration) ease-out var(--delay) forwards;
+	will-change: transform, opacity;
+}
+
+.popcorn-kernel--tone-1 {
+	background: #fef3c7;
+	box-shadow:
+		calc(var(--kernel-size) * 0.28) calc(var(--kernel-size) * -0.16) 0 calc(var(--kernel-size) * 0.13)
+			#fffbeb,
+		calc(var(--kernel-size) * -0.26) calc(var(--kernel-size) * 0.1) 0 calc(var(--kernel-size) * 0.11)
+			#fde68a,
+		calc(var(--kernel-size) * 0.1) calc(var(--kernel-size) * 0.24) 0 calc(var(--kernel-size) * 0.12)
+			#fef3c7,
+		calc(var(--kernel-size) * -0.2) calc(var(--kernel-size) * -0.24) 0 calc(var(--kernel-size) * 0.1)
+			#fff7d6;
+}
+
+.popcorn-kernel--tone-2 {
+	background: #facc15;
+	box-shadow:
+		calc(var(--kernel-size) * 0.28) calc(var(--kernel-size) * -0.16) 0 calc(var(--kernel-size) * 0.13)
+			#fde68a,
+		calc(var(--kernel-size) * -0.26) calc(var(--kernel-size) * 0.1) 0 calc(var(--kernel-size) * 0.11)
+			#eab308,
+		calc(var(--kernel-size) * 0.1) calc(var(--kernel-size) * 0.24) 0 calc(var(--kernel-size) * 0.12)
+			#facc15,
+		calc(var(--kernel-size) * -0.2) calc(var(--kernel-size) * -0.24) 0 calc(var(--kernel-size) * 0.1)
+			#fef08a;
+}
+
+@keyframes popcorn-rise {
+	0% {
+		transform: translateX(-50%) translateY(0) rotate(0deg) scale(var(--scale));
+		opacity: 1;
+	}
+
+	70% {
+		opacity: 1;
+	}
+
+	100% {
+		transform: translateX(calc(-50% + var(--drift))) translateY(calc(-1 * var(--rise)))
+			rotate(var(--rotation)) scale(calc(var(--scale) * 0.85));
+		opacity: 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.popcorn-kernel {
+		animation: none;
+		display: none;
+	}
+}
