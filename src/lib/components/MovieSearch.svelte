@@ -94,6 +94,9 @@
 		formData.set('title', result.title);
 		formData.set('tmdbId', String(result.tmdbId));
 		formData.set('posterUrl', result.posterUrl ?? '');
+		if (result.year) {
+			formData.set('releaseYear', result.year);
+		}
 
 		try {
 			const response = await fetch('?/addMovie', { method: 'POST', body: formData });

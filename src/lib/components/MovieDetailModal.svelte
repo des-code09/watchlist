@@ -10,15 +10,7 @@
 		getCachedMovieDetails,
 		type MovieDetails
 	} from '$lib/movie-details';
-
-	export type ListMovie = {
-		id: number;
-		title: string;
-		tmdbId: number | null;
-		posterUrl: string | null;
-		userRating: number | null;
-		createdAt: Date;
-	};
+	import { parseGenres, type ListMovie } from '$lib/movie';
 
 	let {
 		movie,
@@ -47,6 +39,10 @@
 
 	const displayTitle = $derived(details?.title ?? movie?.title ?? '');
 	const hasTrailer = $derived(details?.trailer != null);
+	const displayYear = $derived(details?.releaseYear ?? (movie?.releaseYear != null ? String(movie.releaseYear) : null));
+	const displayGenres = $derived(
+		details?.genres?.length ? details.genres : parseGenres(movie?.genres ?? null)
+	);
 
 	function formatTmdbScore(score: number): string {
 		return `${score}/10`;
@@ -240,12 +236,12 @@
 					{#if loadError}
 						<p class="error movie-detail-status">{loadError}</p>
 					{:else}
-						{#if details?.releaseYear || details?.voteAverage != null}
+						{#if displayYear || details?.voteAverage != null}
 							<p class="movie-detail-meta">
-								{#if details?.releaseYear}
-									<span>{details.releaseYear}</span>
+								{#if displayYear}
+									<span>{displayYear}</span>
 								{/if}
-								{#if details?.releaseYear && details?.voteAverage != null}
+								{#if displayYear && details?.voteAverage != null}
 									<span class="movie-detail-meta-sep" aria-hidden="true">·</span>
 								{/if}
 								{#if details?.voteAverage != null}
@@ -254,9 +250,9 @@
 							</p>
 						{/if}
 
-						{#if (details?.genres ?? []).length > 0}
+						{#if displayGenres.length > 0}
 							<div class="movie-detail-pills">
-								{#each details?.genres ?? [] as genre (genre)}
+								{#each displayGenres as genre (genre)}
 									<span class="movie-detail-pill">{genre}</span>
 								{/each}
 							</div>

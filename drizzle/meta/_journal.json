@@ -29,6 +29,20 @@
       "when": 1783360000000,
       "tag": "0003_add_movie_user_rating",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1783362150960,
+      "tag": "0004_jazzy_zodiak",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1783362281237,
+      "tag": "0005_safe_red_wolf",
+      "breakpoints": true
     }
   ]
 }

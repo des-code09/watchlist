@@ -1,10 +1,11 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { and, desc, eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
+import { formatGenres, isMovieStatus, type MovieStatus } from '$lib/movie';
 import { auth } from '$lib/server/auth';
 import { db } from '$lib/server/db';
 import { movie } from '$lib/server/db/schema';
-import { isValidPosterUrl } from '$lib/server/tmdb';
+import { getMovieDetails, isValidPosterUrl } from '$lib/server/tmdb';
 
 export const load: PageServerLoad = async (event) => {
 	const user = event.locals.user;
@@ -12,13 +13,37 @@ export const load: PageServerLoad = async (event) => {
 		return redirect(302, '/login');
 	}
 
-	const movies = await db
+	const rows = await db
 		.select()
 		.from(movie)
 		.where(eq(movie.userId, user.id))
 		.orderBy(desc(movie.createdAt));
 
-	return { movies };
+	await Promise.all(
+		rows
+			.filter((row) => row.tmdbId != null && row.tmdbRating == null)
+			.map(async (row) => {
+				try {
+					const details = await getMovieDetails(row.tmdbId!);
+					if (details.voteAverage != null) {
+						await db
+							.update(movie)
+							.set({ tmdbRating: details.voteAverage })
+							.where(eq(movie.id, row.id));
+						row.tmdbRating = details.voteAverage;
+					}
+				} catch {
+					// Skip if TMDB details fail
+				}
+			})
+	);
+
+	return {
+		movies: rows.map((row) => ({
+			...row,
+			status: (isMovieStatus(row.status) ? row.status : 'to_watch') as MovieStatus
+		}))
+	};
 };
 
 export const actions: Actions = {
@@ -32,6 +57,7 @@ export const actions: Actions = {
 		const title = formData.get('title')?.toString().trim() ?? '';
 		const tmdbIdRaw = formData.get('tmdbId')?.toString();
 		const posterUrl = formData.get('posterUrl')?.toString().trim() ?? '';
+		const releaseYearRaw = formData.get('releaseYear')?.toString().trim() ?? '';
 		const tmdbId = tmdbIdRaw ? Number.parseInt(tmdbIdRaw, 10) : NaN;
 
 		if (!title) {
@@ -44,6 +70,34 @@ export const actions: Actions = {
 
 		if (!isValidPosterUrl(posterUrl || null)) {
 			return fail(400, { message: 'Invalid poster URL' });
+		}
+
+		let releaseYear: number | null = null;
+		if (releaseYearRaw) {
+			const parsedYear = Number.parseInt(releaseYearRaw, 10);
+			if (!Number.isNaN(parsedYear) && parsedYear > 0) {
+				releaseYear = parsedYear;
+			}
+		}
+
+		let genres: string | null = null;
+		let tmdbRating: number | null = null;
+		try {
+			const details = await getMovieDetails(tmdbId);
+			if (details.genres.length > 0) {
+				genres = formatGenres(details.genres);
+			}
+			if (details.voteAverage != null) {
+				tmdbRating = details.voteAverage;
+			}
+			if (releaseYear == null && details.releaseYear) {
+				const parsedYear = Number.parseInt(details.releaseYear, 10);
+				if (!Number.isNaN(parsedYear) && parsedYear > 0) {
+					releaseYear = parsedYear;
+				}
+			}
+		} catch {
+			// Proceed without genres if TMDB details fail
 		}
 
 		const [existing] = await db
@@ -60,6 +114,10 @@ export const actions: Actions = {
 			title,
 			tmdbId,
 			posterUrl: posterUrl || null,
+			releaseYear,
+			genres,
+			tmdbRating,
+			status: 'to_watch',
 			userId: user.id
 		});
 	},
@@ -106,6 +164,35 @@ export const actions: Actions = {
 		const result = await db
 			.update(movie)
 			.set({ userRating })
+			.where(and(eq(movie.id, id), eq(movie.userId, user.id)))
+			.returning({ id: movie.id });
+
+		if (result.length === 0) {
+			return fail(404, { message: 'Movie not found' });
+		}
+	},
+	updateStatus: async (event) => {
+		const user = event.locals.user;
+		if (!user) {
+			return redirect(302, '/login');
+		}
+
+		const formData = await event.request.formData();
+		const idRaw = formData.get('id')?.toString();
+		const statusRaw = formData.get('status')?.toString();
+		const id = idRaw ? Number.parseInt(idRaw, 10) : NaN;
+
+		if (!idRaw || Number.isNaN(id)) {
+			return fail(400, { message: 'Invalid movie' });
+		}
+
+		if (!statusRaw || !isMovieStatus(statusRaw)) {
+			return fail(400, { message: 'Invalid status' });
+		}
+
+		const result = await db
+			.update(movie)
+			.set({ status: statusRaw })
 			.where(and(eq(movie.id, id), eq(movie.userId, user.id)))
 			.returning({ id: movie.id });
 
