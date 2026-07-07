@@ -47,7 +47,20 @@
 
 	/* Layout */
 	--content-max-width: 55rem;
-	--transition-theme: 0.2s ease;
+	--transition-theme: 0.25s ease;
+	--transition-theme-colors:
+		color var(--transition-theme),
+		background-color var(--transition-theme),
+		border-color var(--transition-theme),
+		box-shadow var(--transition-theme);
+	--transition-illus-colors:
+		--illus-accent var(--transition-theme),
+		--illus-accent-alt var(--transition-theme),
+		--illus-rim var(--transition-theme),
+		--illus-rim-shadow var(--transition-theme),
+		--illus-inside var(--transition-theme),
+		--illus-surface var(--transition-theme),
+		--illus-outline var(--transition-theme);
 
 	/* Form controls */
 	--control-height: 2.5rem;
@@ -69,6 +82,48 @@
 	--color-error: #b91c1c;
 	--color-focus-ring: rgb(41 37 36 / 0.08);
 	--shadow: 0 1px 3px rgb(28 25 23 / 0.06), 0 4px 12px rgb(28 25 23 / 0.04);
+}
+
+@property --illus-accent {
+	syntax: '<color>';
+	inherits: true;
+	initial-value: transparent;
+}
+
+@property --illus-accent-alt {
+	syntax: '<color>';
+	inherits: true;
+	initial-value: transparent;
+}
+
+@property --illus-rim {
+	syntax: '<color>';
+	inherits: true;
+	initial-value: transparent;
+}
+
+@property --illus-rim-shadow {
+	syntax: '<color>';
+	inherits: true;
+	initial-value: transparent;
+}
+
+@property --illus-inside {
+	syntax: '<color>';
+	inherits: true;
+	initial-value: transparent;
+}
+
+@property --illus-surface {
+	syntax: '<color>';
+	inherits: true;
+	initial-value: transparent;
+}
+
+@property --illus-outline {
+	syntax: '<color>';
+	inherits: true;
+	initial-value: transparent;
 }
 
 [data-theme='light'] {

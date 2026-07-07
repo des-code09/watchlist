@@ -9,6 +9,8 @@
 
 html {
 	min-height: 100%;
+	background: var(--color-bg);
+	transition: var(--transition-theme-colors);
 }
 
 body {
@@ -20,9 +22,7 @@ body {
 	color: var(--color-text);
 	background: var(--color-bg);
 	-webkit-font-smoothing: antialiased;
-	transition:
-		color var(--transition-theme),
-		background-color var(--transition-theme);
+	transition: var(--transition-theme-colors);
 }
 
 html.scroll-locked,

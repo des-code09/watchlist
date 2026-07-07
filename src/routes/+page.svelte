@@ -4,6 +4,7 @@
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import { fade } from 'svelte/transition';
 	import MovieDetailModal from '$lib/components/MovieDetailModal.svelte';
+	import MovieListEmpty from '$lib/components/MovieListEmpty.svelte';
 	import MovieListHeader from '$lib/components/MovieListHeader.svelte';
 	import MovieSearch from '$lib/components/MovieSearch.svelte';
 	import MovieStatusPill from '$lib/components/MovieStatusPill.svelte';
@@ -14,6 +15,7 @@
 		filterMoviesByGenres,
 		filterMoviesByStatus,
 		formatTmdbRating,
+		getMovieListEmptyState,
 		sortMovies,
 		type ListMovie,
 		type MovieListSort,
@@ -42,12 +44,25 @@
 		)
 	);
 
+	const emptyState = $derived(
+		getMovieListEmptyState({
+			totalMovies: data.movies.length,
+			statusFilter,
+			genreFilter
+		})
+	);
+
 	function openDetail(movie: ListMovie) {
 		selectedMovie = movie;
 	}
 
 	function closeDetail() {
 		selectedMovie = null;
+	}
+
+	function clearFilters() {
+		statusFilter = 'all';
+		genreFilter = [];
 	}
 </script>
 
@@ -59,20 +74,14 @@
 <section>
 	<h2>Your list</h2>
 	{#if data.movies.length === 0}
-		<p class="empty">
-			<Film size={32} />
-			No movies yet. Add one above.
-		</p>
+		<MovieListEmpty state={emptyState} />
 	{:else}
 		<div class="movie-list">
 			<div class="movie-list-table">
 				<MovieListHeader bind:sort bind:statusFilter bind:genreFilter {availableGenres} />
 
 				{#if visibleMovies.length === 0}
-					<p class="empty movie-list-empty">
-						<Film size={32} />
-						No movies match this filter.
-					</p>
+					<MovieListEmpty state={emptyState} variant="inline" onClearFilters={clearFilters} />
 				{:else}
 					<ul>
 						{#each visibleMovies as movie (movie.id)}
