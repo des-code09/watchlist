@@ -1,6 +1,6 @@
 <script lang="ts">
-	import EmptyStateIllustration from '$lib/components/EmptyStateIllustration.svelte';
-	import type { MovieListEmptyState } from '$lib/movie';
+	import EmptyStateIllustration from '$lib/components/empty-states/EmptyStateIllustration.svelte';
+	import type { MovieListEmptyState } from '$lib/movie-empty-state';
 
 	let {
 		state,

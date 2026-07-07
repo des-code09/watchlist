@@ -1,0 +1,68 @@
+/* Empty state illustration tokens */
+
+.empty-illustration-svg--popcorn-tub,
+.empty-illustration-svg--spilled-popcorn-tub,
+.full-popcorn-tub,
+.spilled-popcorn-tub,
+.filling-popcorn-tub {
+	--illus-accent: #d94a4a;
+	--illus-accent-alt: #f7f7f5;
+	--illus-rim: #efefec;
+	--illus-rim-shadow: #ddd9d2;
+	--illus-inside: #ece7dc;
+	--illus-outline: rgb(28 25 23 / 0.18);
+	transition: var(--transition-illus-colors);
+}
+
+.empty-illustration-svg--bookmark {
+	--illus-accent: #c96a52;
+	--illus-accent-alt: #f3ebe3;
+	--illus-surface: #f0ebe3;
+	--illus-inside: #ddd5c9;
+	--illus-outline: rgb(28 25 23 / 0.18);
+	transition: var(--transition-illus-colors);
+}
+
+[data-theme='dark'] .empty-illustration-svg--popcorn-tub,
+[data-theme='dark'] .empty-illustration-svg--spilled-popcorn-tub,
+[data-theme='dark'] .full-popcorn-tub,
+[data-theme='dark'] .spilled-popcorn-tub,
+[data-theme='dark'] .filling-popcorn-tub {
+	--illus-accent: #c94a4a;
+	--illus-accent-alt: #3d3935;
+	--illus-rim: #44403c;
+	--illus-rim-shadow: #35302d;
+	--illus-inside: #35302d;
+	--illus-outline: rgb(250 250 249 / 0.14);
+}
+
+[data-theme='dark'] .empty-illustration-svg--bookmark {
+	--illus-accent: #d47a62;
+	--illus-accent-alt: #44403c;
+	--illus-surface: #35302d;
+	--illus-inside: #44403c;
+	--illus-outline: rgb(250 250 249 / 0.14);
+}
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme]) .empty-illustration-svg--popcorn-tub,
+	:root:not([data-theme]) .empty-illustration-svg--spilled-popcorn-tub,
+	:root:not([data-theme]) .full-popcorn-tub,
+	:root:not([data-theme]) .spilled-popcorn-tub,
+	:root:not([data-theme]) .filling-popcorn-tub {
+		--illus-accent: #c94a4a;
+		--illus-accent-alt: #3d3935;
+		--illus-rim: #44403c;
+		--illus-rim-shadow: #35302d;
+		--illus-inside: #35302d;
+		--illus-outline: rgb(250 250 249 / 0.14);
+	}
+
+	:root:not([data-theme]) .empty-illustration-svg--bookmark {
+		--illus-accent: #d47a62;
+		--illus-accent-alt: #44403c;
+		--illus-surface: #35302d;
+		--illus-inside: #44403c;
+		--illus-outline: rgb(250 250 249 / 0.14);
+	}
+}

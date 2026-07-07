@@ -15,12 +15,12 @@
 		filterMoviesByGenres,
 		filterMoviesByStatus,
 		formatTmdbRating,
-		getMovieListEmptyState,
 		sortMovies,
 		type ListMovie,
 		type MovieListSort,
 		type MovieStatusFilter
 	} from '$lib/movie';
+	import { getMovieListEmptyState } from '$lib/movie-empty-state';
 	import { prefetchMovieDetails } from '$lib/movie-details';
 	import type { PageData } from './$types';
 

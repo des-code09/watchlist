@@ -1,0 +1,61 @@
+/* Empty state animations */
+
+.filling-popcorn-piece {
+	transform-box: fill-box;
+	transform-origin: center;
+	opacity: 0;
+	animation: filling-popcorn-piece-drop 5s ease-in-out infinite;
+	animation-delay: var(--piece-delay);
+}
+
+@keyframes filling-popcorn-piece-drop {
+	0%,
+	3% {
+		opacity: 0;
+		transform: translateY(-24px) scale(calc(0.3 * var(--piece-scale, 1)))
+			rotate(calc(var(--piece-rotate) - 18deg));
+	}
+
+	11% {
+		opacity: 1;
+		transform: translateY(2px) scale(calc(1.08 * var(--piece-scale, 1)))
+			rotate(calc(var(--piece-rotate) + 6deg));
+	}
+
+	18%,
+	82% {
+		opacity: 1;
+		transform: translateY(0) scale(var(--piece-scale, 1)) rotate(var(--piece-rotate));
+	}
+
+	90%,
+	100% {
+		opacity: 0;
+		transform: translateY(8px) scale(calc(0.65 * var(--piece-scale, 1)))
+			rotate(calc(var(--piece-rotate) + 12deg));
+	}
+}
+
+.filling-popcorn-tub-static .filling-popcorn-piece {
+	animation: none;
+	opacity: 0;
+	transform: rotate(var(--piece-rotate));
+}
+
+.filling-popcorn-tub-static .filling-popcorn-piece-static {
+	opacity: 1;
+	transform: translateY(0) scale(var(--piece-scale, 1)) rotate(var(--piece-rotate));
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.filling-popcorn-piece {
+		animation: none;
+		opacity: 0;
+		transform: rotate(var(--piece-rotate));
+	}
+
+	.filling-popcorn-piece-static {
+		opacity: 1;
+		transform: translateY(0) scale(var(--piece-scale, 1)) rotate(var(--piece-rotate));
+	}
+}
