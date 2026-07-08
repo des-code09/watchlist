@@ -3,6 +3,7 @@
 @import './styles/empty-states.css';
 @import './styles/empty-state-illustrations.css';
 @import './styles/empty-state-animations.css';
+@import './styles/responsive.css';
 
 *,
 *::before,

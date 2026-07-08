@@ -47,12 +47,16 @@
 
 	/* Layout */
 	--content-max-width: 55rem;
+	--breakpoint-sm: 40rem;
+	--page-padding-x: var(--space-5);
+	--page-padding-x-mobile: var(--space-4);
 	--transition-theme: 0.25s ease;
 	--transition-theme-colors:
 		color var(--transition-theme),
 		background-color var(--transition-theme),
 		border-color var(--transition-theme),
 		box-shadow var(--transition-theme);
+	--shadow-none: 0 1px 3px rgb(28 25 23 / 0), 0 4px 12px rgb(28 25 23 / 0);
 	--transition-illus-colors:
 		--illus-accent var(--transition-theme),
 		--illus-accent-alt var(--transition-theme),
@@ -72,7 +76,7 @@
 	/* Accent & semantic colors — light mode */
 	--color-bg: #f4f2ef;
 	--color-surface: #ffffff;
-	--color-row-hover: var(--color-bg);
+	--color-row-hover: #faf9f7;
 	--color-text: #1c1917;
 	--color-text-muted: #78716c;
 	--color-border: #e7e5e4;
@@ -132,7 +136,7 @@
 	/* Accent & semantic colors — light mode */
 	--color-bg: #f4f2ef;
 	--color-surface: #ffffff;
-	--color-row-hover: var(--color-bg);
+	--color-row-hover: #faf9f7;
 	--color-text: #1c1917;
 	--color-text-muted: #78716c;
 	--color-border: #e7e5e4;
@@ -160,6 +164,7 @@
 	--color-error: #f87171;
 	--color-focus-ring: rgb(250 250 249 / 0.1);
 	--shadow: 0 1px 3px rgb(0 0 0 / 0.2), 0 4px 12px rgb(0 0 0 / 0.15);
+	--shadow-none: 0 1px 3px rgb(0 0 0 / 0), 0 4px 12px rgb(0 0 0 / 0);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -179,5 +184,6 @@
 		--color-error: #f87171;
 		--color-focus-ring: rgb(250 250 249 / 0.1);
 		--shadow: 0 1px 3px rgb(0 0 0 / 0.2), 0 4px 12px rgb(0 0 0 / 0.15);
+		--shadow-none: 0 1px 3px rgb(0 0 0 / 0), 0 4px 12px rgb(0 0 0 / 0);
 	}
 }

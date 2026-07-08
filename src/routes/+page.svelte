@@ -6,6 +6,7 @@
 	import MovieDetailModal from '$lib/components/MovieDetailModal.svelte';
 	import MovieListEmpty from '$lib/components/MovieListEmpty.svelte';
 	import MovieListHeader from '$lib/components/MovieListHeader.svelte';
+	import MovieListMobileFilters from '$lib/components/MovieListMobileFilters.svelte';
 	import MovieSearch from '$lib/components/MovieSearch.svelte';
 	import MovieStatusPill from '$lib/components/MovieStatusPill.svelte';
 	import {
@@ -78,7 +79,10 @@
 	{:else}
 		<div class="movie-list">
 			<div class="movie-list-table">
-				<MovieListHeader bind:sort bind:statusFilter bind:genreFilter {availableGenres} />
+				<div class="movie-list-header-desktop">
+					<MovieListHeader bind:sort bind:statusFilter bind:genreFilter {availableGenres} />
+				</div>
+				<MovieListMobileFilters bind:sort bind:statusFilter bind:genreFilter {availableGenres} />
 
 				{#if visibleMovies.length === 0}
 					<MovieListEmpty state={emptyState} variant="inline" onClearFilters={clearFilters} />
@@ -86,8 +90,8 @@
 					<ul>
 						{#each visibleMovies as movie (movie.id)}
 							{@const genreLabel = displayGenre(movie.genres)}
-							<li class="movie-list-row" out:fade={{ duration: 200 }}>
-							<div class="movie-list-cell">
+						<li class="movie-list-row" out:fade={{ duration: 200 }}>
+							<div class="movie-list-cell movie-list-cell-primary">
 								<button
 									type="button"
 									class="movie-row-button"
@@ -95,13 +99,23 @@
 									onfocus={() => movie.tmdbId != null && prefetchMovieDetails(movie.tmdbId)}
 									onclick={() => openDetail(movie)}
 								>
-									<div class="movie-title">
+									<div class="movie-list-card-body">
 										{#if movie.posterUrl}
 											<img src={movie.posterUrl} alt="" class="movie-poster" loading="lazy" />
 										{:else}
-											<Film size={18} />
+											<span class="movie-poster-fallback" aria-hidden="true">
+												<Film size={18} />
+											</span>
 										{/if}
-										<span class="movie-row-title">{movie.title}</span>
+										<div class="movie-list-card-copy">
+											<span class="movie-row-title">{movie.title}</span>
+											<p class="movie-list-row-meta">
+												<span class="movie-list-row-meta-genre">{genreLabel ?? '—'}</span>
+												{#if movie.tmdbRating != null}
+													<span class="movie-list-row-meta-rating">{formatTmdbRating(movie.tmdbRating)}</span>
+												{/if}
+											</p>
+										</div>
 									</div>
 								</button>
 							</div>
@@ -110,21 +124,23 @@
 								{genreLabel ?? '—'}
 							</div>
 
-							<div class="movie-list-cell movie-list-cell-muted">
+							<div class="movie-list-cell movie-list-cell-muted movie-list-cell-rating">
 								{movie.tmdbRating != null ? formatTmdbRating(movie.tmdbRating) : '—'}
 							</div>
 
-							<div class="movie-list-cell movie-list-cell-status">
-								<MovieStatusPill movieId={movie.id} status={movie.status} />
-							</div>
+							<div class="movie-list-card-footer">
+								<div class="movie-list-cell movie-list-cell-status">
+									<MovieStatusPill movieId={movie.id} status={movie.status} />
+								</div>
 
-							<div class="movie-list-cell movie-list-cell-actions">
-								<form method="post" action="?/removeMovie" use:enhance>
-									<input type="hidden" name="id" value={movie.id} />
-									<button type="submit" class="btn-icon-only" aria-label="Remove movie">
-										<Trash2 size={16} />
-									</button>
-								</form>
+								<div class="movie-list-cell movie-list-cell-actions">
+									<form method="post" action="?/removeMovie" use:enhance>
+										<input type="hidden" name="id" value={movie.id} />
+										<button type="submit" class="btn-icon-only" aria-label="Remove movie">
+											<Trash2 size={16} />
+										</button>
+									</form>
+								</div>
 							</div>
 						</li>
 					{/each}

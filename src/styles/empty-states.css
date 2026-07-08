@@ -137,3 +137,18 @@
 .empty-action:hover {
 	color: var(--color-accent);
 }
+
+@media (max-width: 40rem) {
+	.empty {
+		--empty-illustration-size: 7rem;
+		--empty-headline-line-height: calc(1.125rem * var(--line-height-tight));
+		--empty-container-height: calc(
+			var(--space-8) * 2 + var(--empty-illustration-size) + var(--space-6) + var(--empty-copy-height)
+		);
+		padding: var(--space-8) var(--space-4);
+	}
+
+	.empty-headline {
+		font-size: 1.125rem;
+	}
+}
